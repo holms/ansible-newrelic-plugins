@@ -1,0 +1,6 @@
+---
+
+- name: Copy agent configuration file
+  template:
+    src: "ror.j2"
+    dest: "{{ newrelic_ror.app_conf_dir }}"

@@ -1,0 +1,30 @@
+---
+
+- name: meetme | Install python dependencies
+  apt:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - python-dev
+    - python-pip
+
+- name: meetme | Install meetme agent
+  pip:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - newrelic-plugin-agent
+
+- name: meetme | Copy meetme config
+  template:
+    src: meetme.j2
+    dest: "{{ newrelic_plugins_dir }}/meetme.cfg"
+  notify: restart meetme
+
+- name: meetme | Copy meetme init
+  template:
+    src: meetme.init.j2
+    dest: "/etc/init.d/newrelic-meetme"
+    mode: "a+x"
+
+

@@ -1,0 +1,15 @@
+---
+
+- include: meetme.yml
+
+- name: pgsql | Install agent
+  pip:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - newrelic-plugin-agent[postgresql]
+
+- name: pgsql | Start meetme
+  service:
+    name: newrelic-meetme
+    state: started

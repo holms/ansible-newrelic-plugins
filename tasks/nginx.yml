@@ -1,0 +1,43 @@
+---
+
+- name: nginx | Install gem depedencies
+  gem:
+    name: "{{ item }}"
+    user_install: no
+  with_items:
+    - bundler
+
+- name: nginx | Add key
+  apt_key:
+    url: "http://nginx.org/keys/nginx_signing.key"
+    state: present
+
+- name: nginx | Add repo
+  apt_repository:
+    repo: "deb http://nginx.org/packages/ubuntu/ trusty nginx"
+    state: present
+    update_cache: yes
+
+- name: nginx | Install nginx agent
+  apt:
+    name: nginx-nr-agent
+    state: installed
+
+- name: nginx | Insert License key
+  replace:
+    dest: /etc/nginx-nr-agent/nginx-nr-agent.ini
+    regexp: '^newrelic_license_key\=YOUR_LICENSE_KEY_HERE$'
+    replace: 'newrelic_license_key={{ newrelic_license_key }}'
+  notify: restart nginx-agent
+
+- name: nginx | Copy vhosts to nginx
+  template:
+    src: templates/nginx.j2
+    dest: /etc/nginx/sites-enabled/newrelic.conf
+  notify: restart nginx
+
+- name: nginx | Start nginx agent
+  service:
+    name: nginx-nr-agent
+    state: started
+    enabled: yes

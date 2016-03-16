@@ -1,0 +1,22 @@
+---
+
+- name: Install dependencies
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - build-essential
+
+- name: Create newrelic config dir
+  file:
+    state: directory
+    path: "{{ newrelic_plugins_dir }}"
+
+- include: redis.yml
+  when: newrelic_redis_enabled
+
+- include: pgsql.yml
+  when: newrelic_pgsql_enabled
+
+- include: nginx.yml
+  when: newrelic_nginx_enabled

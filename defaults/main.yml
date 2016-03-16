@@ -1,0 +1,20 @@
+---
+newrelic_plugins_dir: "/usr/local/newrelic_plugins"
+
+newrelic_redis_enabled: no
+newrelic_redis_url: redis://127.0.0.1:6379
+newrelic_redis_db: db0
+
+newrelic_pgsql_enabled: no
+# newrelic_pgsql:
+#     host: localhost
+#     port: 5432
+#     user: postgres
+#     password: postgres
+#     dbname: postgres
+#     superuser: False
+#     relation_stats: False
+
+newrelic_nginx_enabled: no
+#newrelic_nginx:
+#    source_name: ""

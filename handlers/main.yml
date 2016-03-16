@@ -1,0 +1,21 @@
+---
+
+- name: restart redis
+  service:
+    name: newrelic-redis
+    state: restarted
+
+- name: restart meetme
+  service:
+    name: newrelic-meetme
+    state: restarted
+
+- name: restart nginx-agent
+  service:
+    name: nginx-nr-agent
+    state: restarted
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted

@@ -1,0 +1,28 @@
+---
+
+- name: redis | Check if ruby installed already
+  stat:
+    path: "/usr/bin/ruby2.1"
+  register: rubyfound
+
+- name: redis | Add ruby repository
+  apt_repository:
+    repo: "ppa:brightbox/ruby-ng"
+  when: not rubyfound.stat.exists
+
+- name: redis | Install Ruby
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - ruby2.1
+  when: not rubyfound.stat.exists
+
+- name: redis | Link ruby 2.1 stuff
+  file:
+    src: "/usr/bin/{{item}}2.1"
+    dest: "/usr/bin/{{item}}"
+    state: link
+  with_items:
+    - gem
+    - ruby

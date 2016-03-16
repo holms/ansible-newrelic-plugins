@@ -1,0 +1,63 @@
+---
+
+- include: ruby.yml
+
+- name: redis | Install gem dependencies
+  gem:
+    name: "{{item}}"
+    user_install: no
+  with_items:
+    - newrelic_plugin
+    - bundler
+
+- name: redis | Check if installed already
+  stat:
+    path: "{{ newrelic_plugins_dir }}/redis"
+  register: installed
+
+- name: redis | Install redis gem
+  gem:
+    name: "{{ item }}"
+    user_install: no
+  with_items:
+    - dante
+    - redis
+  when: not installed.stat.exists
+
+- name: redis | Unpack newrelic_redis_plugin
+  unarchive:
+    src: "https://github.com/kenjij/newrelic_redis_plugin/archive/v1.0.1.tar.gz"
+    dest: /root
+    copy: no
+  when: not installed.stat.exists
+
+- name: redis | Copy binary file to destination
+  copy:
+    remote_src: yes
+    src: /root/newrelic_redis_plugin-1.0.1/newrelic_redis_agent
+    dest: "{{ newrelic_plugins_dir }}/redis"
+    mode: "a+x"
+  when: not installed.stat.exists
+
+- name: redis | Copy config file to destination
+  template:
+    src: redis.j2
+    dest: "{{ newrelic_plugins_dir }}/redis.conf"
+  notify: restart redis
+
+- name: redis | Copy upstart script to destination
+  template:
+    src: redis.init.j2
+    dest: /etc/init.d/newrelic-redis
+    mode: "a+x"
+
+- name: redis | Start plugin
+  service:
+    name: newrelic-redis
+    state: started
+    enabled: yes
+
+- name: redis | Cleanup
+  file:
+    state: absent
+    path: /root/newrelic_redis_plugin-1.0.1
